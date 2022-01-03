@@ -1,0 +1,739 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+	
+<script src="tmi.min.js"></script>
+	
+<script>
+//Connect to chat:
+var yourchannel='';
+	
+	twitchname(yourchannel);
+
+//this is just a simple random generator with an illusion of a spin on the wheel of fortune.
+//Made by Jari Nikula
+
+document.addEventListener('keypress', logKey);
+//window.addEventListener('keypress', logKey);
+
+function logKey(e) {
+	//console.log(e.code);
+	if(e.code=="Numpad7"){
+		SpinIt();
+	}
+	if(e.code=="Numpad8"){
+		delallpie();
+	}
+}
+
+var mycanvas;
+var time=0;
+var rotation=0;
+var speed=0;
+var PR=0;
+var winnertimer=0;
+var mySound;
+var namebgcolor=localStorage.getItem("namebgcolor") || 200;
+var namebgopacity=localStorage.getItem("namebgopacity") || 30;
+var namebg2d=localStorage.getItem("namebg2d") || 15;
+var namenrs=localStorage.getItem("namenrs") || 2;
+var namebglight=localStorage.getItem("namebglight") || 50;
+var nameTcolor=localStorage.getItem("nameTcolor") || 0;
+var nameTlight=localStorage.getItem("nameTlight") || 50;
+var nameTScolor=localStorage.getItem("nameTScolor") || 50;
+var nameTSlight=localStorage.getItem("nameTSlight") || 50;
+var nameTSblur=localStorage.getItem("nameTSblur") || 3;
+var appBGcolor=localStorage.getItem("appBGcolor") || 120;
+var appBGlight=localStorage.getItem("appBGlight") || 50;
+
+var cutoutBG=localStorage.getItem("cutoutBG") || true;
+
+//myStorage = window.localStorage;
+
+var imgname=localStorage.getItem("bild") || "bg.png";
+var myImage=new image(imgname);
+
+//fetch all names to here
+var namesIn=["One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","NineTeen","Twenty"]
+
+//exclude all double
+let names = [...new Set(namesIn)];
+
+var random=(Math.PI*2/names.length)*-(PR=Math.floor(Math.random() * Math.floor(names.length))+1)
+
+
+function init(){	 
+			mycanvas=new canvas(640,480,"main");
+			bgcanvas=new canvas(640,480);
+			bgpicturecanvas=new canvas(640,480);
+
+		    mySound = new sound("SFB-fortune-wheel-1.mp3");
+			winSound = new sound("119003629.mp3");
+
+			drawWheel(wheelspeed());
+
+			//myImage.draw(mycanvas,0,0);
+			showpie();
+
+			document.getElementById('selectColor').value = namebgcolor;
+			document.getElementById('selectColor1').value = namebgopacity;
+			document.getElementById('selectColor2').value = namebg2d;
+			document.getElementById('selectColor3').value = namenrs;
+			document.getElementById('selectColor3b').value = namebglight;
+			document.getElementById('selectColor4').value = nameTcolor;
+			document.getElementById('selectColor5').value = nameTlight;
+			document.getElementById('selectColor6').value = nameTScolor;
+			document.getElementById('selectColor7').value = nameTSlight;
+			document.getElementById('selectColor8').value = nameTSblur;
+			document.getElementById('selectColor9').value = appBGcolor;
+			document.getElementById('selectColor10').value = appBGlight;
+
+			dragElement(document.getElementById("mdiv"));
+			dragElement(document.getElementById("vdiv"));
+
+			document.getElementById("selectColor").oninput = function() {namebgcolor=document.getElementById("selectColor").value,drawWheel(),savetostorage("namebgcolor",namebgcolor)};
+			document.getElementById("selectColor1").oninput = function() {namebgopacity=document.getElementById("selectColor1").value,drawWheel(),savetostorage("namebgopacity",namebgopacity)};
+			document.getElementById("selectColor2").oninput = function() {namebg2d=document.getElementById("selectColor2").value,drawWheel(),savetostorage("namebg2d",namebg2d)};
+			document.getElementById("selectColor3").oninput = function() {namenrs=document.getElementById("selectColor3").value,drawWheel(),savetostorage("namenrs",namenrs)};
+			document.getElementById("selectColor3b").oninput = function() {namebglight=document.getElementById("selectColor3b").value,drawWheel(),savetostorage("namebglight",namebglight)};
+			document.getElementById("selectColor4").oninput = function() {nameTcolor=document.getElementById("selectColor4").value,drawWheel(),savetostorage("nameTcolor",nameTcolor)};
+			document.getElementById("selectColor5").oninput = function() {nameTlight=document.getElementById("selectColor5").value,drawWheel(),savetostorage("nameTlight",nameTlight)};
+			document.getElementById("selectColor6").oninput = function() {nameTScolor=document.getElementById("selectColor6").value,drawWheel(),savetostorage("nameTScolor",nameTScolor)};
+			document.getElementById("selectColor7").oninput = function() {nameTSlight=document.getElementById("selectColor7").value,drawWheel(),savetostorage("nameTSlight",nameTSlight)};
+			document.getElementById("selectColor8").oninput = function() {nameTSblur=document.getElementById("selectColor8").value,drawWheel(),savetostorage("nameTSblur",nameTSblur)};
+			document.getElementById("selectColor9").oninput = function() {appBGcolor=document.getElementById("selectColor9").value,drawWheel(),savetostorage("appBGcolor",appBGcolor)};
+			document.getElementById("selectColor10").oninput = function() {appBGlight=document.getElementById("selectColor10").value,drawWheel(),savetostorage("appBGlight",appBGlight)};
+
+
+			document.getElementById("selectColor").value = namebgcolor;
+			document.getElementById("selectColor1").value = namebgopacity;
+			document.getElementById("selectColor2").value = namebg2d;
+			document.getElementById("selectColor3").value = namenrs;
+			document.getElementById("selectColor3b").value = namebglight;
+			document.getElementById("selectColor4").value = nameTcolor;
+			document.getElementById("selectColor5").value = nameTlight;
+			document.getElementById("selectColor6").value = nameTScolor;
+			document.getElementById("selectColor7").value = nameTSlight;
+			document.getElementById("selectColor8").value = nameTSblur;
+			document.getElementById("selectColor9").value = appBGcolor;
+			document.getElementById("selectColor10").value = appBGlight;
+
+			if(cutoutBG==true){
+				document.getElementById("bgcutCheck").checked = true;
+			}else{
+				document.getElementById("bgcutCheck").checked = false;
+			}
+			
+
+			var imageLoader = document.getElementById('uploadimage');
+			imageLoader.addEventListener('change', handleImage, false);
+
+			myImage.draw(bgpicturecanvas,0,0);
+			drawWheel();
+
+			toggleDiv('mydiv');
+			toggleDiv('mydiv');
+
+			go();
+
+
+}
+
+function go(){
+		time++;
+		
+		mycanvas.fill(`hsl(${~~appBGcolor},99%,${~~appBGlight}%)`); //clear canvas with a color (its a fillrect)
+		
+		bg(wheelspeed());
+		drawrest();
+		winneris();
+
+//		mycanvas.ctx.fillText(cutoutBG,0,90);
+
+		requestAnimFrame( go );
+}
+
+function drawWheel() {
+			document.body.style.backgroundColor = `hsl(${~~appBGcolor},99%,${~~appBGlight}%)`;
+			bgcanvas.clear();
+
+			if (cutoutBG==true){
+				bgcanvas.ctx.save();
+				bgcanvas.ctx.arc(320,240,200,0,9);
+				bgcanvas.ctx.lineTo(320,240);
+				bgcanvas.ctx.fill();
+				bgcanvas.ctx.clip();
+				bgpicturecanvas.draw(bgcanvas,0,0);
+				bgcanvas.ctx.restore();
+  			}else{
+				bgpicturecanvas.draw(bgcanvas,0,0);
+			  }
+
+			var pieSize=Math.PI*2/names.length;
+			for(i=0;i<names.length;i++){
+			  bgcanvas.ctx.beginPath();
+			  bgcanvas.ctx.arc(320,240,200,Place=i*pieSize-1.58+pieSize/2,Place+pieSize);
+			  bgcanvas.ctx.lineTo(320,240);
+		      bgcanvas.ctx.fillStyle=`hsla(${~~namebgcolor+((i%namenrs)*namebg2d)},99%,${namebglight}%,${namebgopacity/100})`;
+			  bgcanvas.ctx.stroke();
+			  bgcanvas.ctx.lineWidth=1;
+		      bgcanvas.ctx.fill();
+			  //text names 
+		      bgcanvas.ctx.save();
+			  bgcanvas.ctx.clip();
+			  bgcanvas.ctx.translate(320,240);
+			  bgcanvas.ctx.rotate(Place+pieSize/2);
+			  bgcanvas.ctx.fillStyle=`hsl(${~~nameTcolor},99%,${~~nameTlight}%)`;
+			  bgcanvas.ctx.shadowColor = `hsl(${~~nameTScolor},99%,${~~nameTSlight}%)`;
+			  bgcanvas.ctx.shadowBlur = nameTSblur;
+			  bgcanvas.ctx.font=(30-names.length/3)+"px Arial";
+			  bgcanvas.ctx.textAlign = "right";
+			  bgcanvas.ctx.fillText(names[i],190,8);  //10+names.length*3
+			  bgcanvas.ctx.restore();
+			}
+}
+
+function wheelspeed() {
+	speed-=0.1;
+	if (speed < 0) {
+          speed=0;
+	}
+
+	return speed*speed/99+random
+}
+
+function winneris(){
+	if(speed==0&&winnertimer>0){
+	 if(winnertimer>90){ 
+	    winSound.play();
+	 }
+	 
+	 winnertimer-=.1;
+ 	 mycanvas.ctx.save();
+	 var Sin=Math.sin(time/20);
+	 mycanvas.ctx.fillStyle=`hsl(${~~nameTcolor},99%,50%)`;
+	 mycanvas.ctx.font=(b=30+Sin*10)+"px Arial";
+	 mycanvas.ctx.textAlign = "center";
+	 mycanvas.ctx.fillText(t=names[PR-1],320,250+Sin*5);
+	 mycanvas.ctx.restore();
+	}
+}
+
+function drawrest() {
+	mycanvas.ctx.beginPath();
+	mycanvas.ctx.arc(320,30,20,3.14,0);
+	mycanvas.ctx.lineTo(320,60);
+	mycanvas.ctx.fillStyle=`hsl(${~~nameTcolor},99%,50%)`;
+    mycanvas.ctx.shadowColor = 'black';
+    mycanvas.ctx.shadowBlur = 3;
+	mycanvas.ctx.fill();
+}
+
+function SpinIt(){
+	if(~~winnertimer==0){
+	speed=82;
+	winnertimer=99;	
+	random=(Math.PI*2/names.length)*-(PR=Math.floor(Math.random() * Math.floor(names.length))+1)
+	mySound.play();
+	addCoin(names[PR-1]);
+	}
+}
+
+
+function drawextra(){
+	mycanvas.ctx.beginPath();
+	var grd = mycanvas.ctx.createRadialGradient(320, 240, 50, 320, 240, 210);
+	grd.addColorStop(0, "#F001");
+	grd.addColorStop(0.8, "#FF02");
+	grd.addColorStop(1, "#fff");
+	mycanvas.ctx.arc(320,240,200,0,7);
+	mycanvas.ctx.fillStyle = grd;
+	mycanvas.ctx.fill();
+}
+
+function bg(rotation){
+	mycanvas.ctx.save();
+	mycanvas.ctx.translate(320,240);
+	mycanvas.ctx.rotate(rotation);
+	bgcanvas.draw(mycanvas,-320,-240);
+  	mycanvas.ctx.restore();	
+}
+
+function addpieman(){
+	addpie(document.getElementById("addtext").value)
+	}
+
+function addpie(In){
+	var intext=In;
+	var v=true;
+	for (i=0;i<names.length;i++){
+	    if(names[i]==intext){
+	    	v=false;
+	    }
+	}
+
+	if (v==true && ~~winnertimer==0){
+	  names.push(intext);
+	}
+	
+	showpie();
+}
+
+function delpie(nr){
+	names.splice(nr, 1); 
+	showpie();
+}
+
+function delallpie(){
+	names.splice(0, names.length); 
+	showpie();
+}
+
+function showpie(){
+	drawWheel();
+
+	//print the array to html
+	var e="";
+	for(var i=0; i<names.length; i++){
+	   e+=names[i] + " <button onclick='delpie("+i+")'>Delete!</button><br/>";
+	}
+
+	e+= "<center><br>Pie slices="+names.length+"<br>Twitch chat: "+yourchannel+"<br><br><button onclick='delallpie()'>Delete All!</button></center>";
+
+	document.getElementById("Result").innerHTML = e;
+
+}
+
+function addnewchat(){
+	twitchname(yourchannel=document.getElementById("Twitchname").value);
+	showpie();
+	}
+
+
+function savetostorage(key,value){
+	localStorage.setItem(key,value);
+}
+
+function resetlocalstorage(){
+	//localStorage.clear();
+	//localStorage.removeItem("");
+
+	localStorage.removeItem("namebgcolor");
+	localStorage.removeItem("namebgopacity");
+	localStorage.removeItem("namebg2d");
+	localStorage.removeItem("namenrs");
+	localStorage.removeItem("namebglight");
+	localStorage.removeItem("nameTcolor");
+	localStorage.removeItem("nameTlight");
+	localStorage.removeItem("nameTScolor");
+	localStorage.removeItem("nameTSlight");
+	localStorage.removeItem("nameTSblur");
+	localStorage.removeItem("appBGcolor");
+	localStorage.removeItem("appBGlight");
+	localStorage.removeItem("cutoutBG");
+	localStorage.removeItem("bild");
+
+	location.reload();
+}
+
+function cutoutBGonoff(){
+	var checkBox = document.getElementById("bgcutCheck");
+	if (checkBox.checked != false){
+		cutoutBG=true;
+		localStorage.removeItem("cutoutBG");      //why did I need to do this? 
+		//savetostorage("cutoutBG",cutoutBG);	  //and not this 
+		drawWheel();
+  	} else {
+		cutoutBG=false;
+		savetostorage("cutoutBG",cutoutBG);
+		drawWheel();
+  	}
+}
+
+//****Core functions****
+
+// requestAnim
+    window.requestAnimFrame = (function(){
+      return  window.requestAnimationFrame       || 
+              window.webkitRequestAnimationFrame || 
+              window.mozRequestAnimationFrame    || 
+              window.oRequestAnimationFrame      || 
+              window.msRequestAnimationFrame     || 
+              function(/* function */ callback, /* DOMElement */ element){
+                window.setTimeout(callback, 1000 / 60);
+              };
+    })();
+
+function canvas(w,h,divname){
+  this.width=w;
+	this.height=h;
+	this.canvas;
+	this.ctx;
+	this.canvas = document.createElement("canvas");
+	if(divname) document.getElementById(divname).appendChild(this.canvas);
+	this.canvas.setAttribute('width', w);
+	this.canvas.setAttribute('height', h);
+	this.ctx = this.canvas.getContext('2d');
+
+  //Fill canvas
+	this.fill = function(color){
+		var tmp = this.ctx.fillStyle;
+		this.ctx.fillStyle = color;
+		this.ctx.fillRect (0, 0, this.canvas.width, this.canvas.height);
+		this.ctx.fillStyle = tmp;
+	}
+
+  //Clear canvas
+ 	this.clear = function(){
+		this.ctx.clearRect (0, 0, this.canvas.width, this.canvas.height);
+	}
+
+  //Draw canvas
+	this.draw = function(dst,x,y){		
+          dst.ctx.drawImage(this.canvas, x, y);
+	}
+
+}
+
+function image(img){
+	this.img = new Image();
+	this.img.src=img;	
+	
+	//Draw image
+	this.draw = function(dst,x,y){	
+		dst.ctx.drawImage(this.img, x,y);
+	}
+}
+
+
+function sound(src) {
+  this.sound = document.createElement("audio");
+  this.sound.src = src;
+  this.sound.setAttribute("preload", "auto");
+  this.sound.setAttribute("controls", "none");
+  this.sound.style.display = "none";
+  document.body.appendChild(this.sound);
+  this.play = function(){
+    this.sound.play();
+  }
+  this.stop = function(){
+    this.sound.pause();
+  }
+}
+
+//******************************
+//connect to twich chat;
+
+function twitchname(yourchannel){
+ const client = new tmi.Client({
+	connection: {
+		secure: true,
+		reconnect: true
+	},
+	channels: [yourchannel]
+ });
+
+ client.connect();
+
+ client.on('message', (channel, tags, message, self) => {
+	//console.log(`${tags['display-name']}: ${message}`);
+	//msg=`${tags['display-name']}: ${message}`
+	if (message === '!enter'){
+	  addpie(`${tags['display-name']}`);
+	}
+ });
+}
+
+//********************************
+//make a div dragable 
+// Make the DIV element draggable:
+
+function dragElement(elmnt) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  if (document.getElementById(elmnt.id + "header")) {
+    // if present, the header is where you move the DIV from:
+    document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+  } else {
+    // otherwise, move the DIV from anywhere inside the DIV:
+    elmnt.onmousedown = dragMouseDown;
+  }
+
+  function dragMouseDown(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+  }
+
+  function closeDragElement() {
+    // stop moving when mouse button is released:
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+}
+
+//******************** file loading
+function handleImage(e){
+var reader = new FileReader();
+
+	reader.onload = function(event){
+
+		var img = new Image();
+		img.onload = function(){
+			bgpicturecanvas.clear();
+			bgpicturecanvas.ctx.drawImage(img,0,0);
+			drawWheel();
+		}
+		img.src = event.target.result;
+		savetostorage("bild",(document.getElementById('uploadimage').value).split(/(\\|\/)/g).pop());
+	}	
+
+	reader.readAsDataURL(e.target.files[0]);     
+}
+
+//************************ div switching
+
+function toggleDiv(divid){
+    on = divid + 'on';
+    off = divid + 'off';
+ 
+    if(document.getElementById(on).style.display == 'block')
+    {
+    document.getElementById(on).style.display = 'none';
+    document.getElementById(off).style.display = 'block';
+    }
+    else
+    {  
+    document.getElementById(off).style.display = 'none';
+    document.getElementById(on).style.display = 'block'
+    }
+}
+
+function addCoin(name){
+	
+	var saveShopData=localStorage.getItem("UserCoins") || "";
+	var shopData=saveShopData.split(",");
+
+	//console.log(shopData);
+
+	var index=shopData.indexOf(name);
+
+	if(index>-1){
+	  shopData[index+1]++;
+	}else{
+	  shopData.push(name);
+	  shopData.push(1);
+	}
+
+	//save new coin info
+	localStorage.setItem('UserCoins', shopData.toString());
+}
+
+</script>		
+
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+		background-color: #0f0;
+      	}
+
+      #small {
+	padding-right: 0px;
+	padding-right: 10px;
+	margin: 0px;
+	height=50px;
+	font-size: 10px;
+	}
+
+      #vdiv {
+        position: absolute;
+		z-index: 7;
+  		border: 0px;
+		}
+
+      #vdivheader {
+  		padding: 10px;
+  		cursor: move;
+  		z-index: 8;
+		}
+
+      #mdiv {
+        position: absolute;
+		z-index: 11;
+  		background-color: #f1f1f1;
+	    background-image: linear-gradient(grey, yellow);
+  		border: 1px solid #d3d3d3;
+	  	text-align: right;
+		left:100%; width:max-content;
+		transform: translateX(-100%);
+		width: 250px;
+		}
+
+      #mdivheader {
+		font-family: Arial, Helvetica, sans-serif;
+  		padding: 10px;
+  		cursor: move;
+  		z-index: 12;
+  		background-color: #2196F3;
+  		color: #fff;
+	  	text-align: left;
+		}
+
+	  #mdiv h4 {
+		font-family: Arial, Helvetica, sans-serif;
+		color: #f00;
+		text-align: left;
+		}
+
+	  #cdiv {
+        position: absolute;
+		z-index: 9;
+  		background-color: #f1f1f1;
+  		border: 1px solid #d3d3d3;
+  		text-align: right;
+		left:50%; width:max-content;
+		transform: translateX(-100%);
+		width: 250px;
+		}
+
+      #cdivheader {
+  		padding: 10px;
+  		cursor: move;
+  		z-index: 10;
+  		background-color: #2196F3;
+  		color: #fff;
+		}
+	  
+	  #cdiv h4 {
+		color: #f00;
+		text-align: left;
+		}
+
+	  #button {
+		border: 1px;
+		float: right;
+		width: 99px;
+		padding: 2px;
+		background-color: #446666;
+	  }
+
+	  #button a {
+		text-decoration: none;
+	  }
+	  
+	  #button a:hover{
+		background-color: #6f9c9c;
+	  }
+
+</style>
+				
+  </head> 
+  <body onLoad="init();">
+	<div id="vdiv">
+		<div id="vdivheader">
+			<center>
+				<div id="main"></div>
+			</center>
+		</div>
+	</div>
+	
+	<div id="mdiv">
+		<div id="mdivheader">Wheel panel: <div id="button"><a href="javascript:;" onmousedown="toggleDiv('mydiv');">Toggle Menu</a></div></div>
+
+		<div id="small">Made by nikula.se</div>
+		
+		
+		<div id="mydivon" style="display:block">
+		 	<br>
+			<center><button onclick="SpinIt()">Spin the Wheel!</button></center>
+			<h4>Add Manually</h4>
+			<input type="text" id="addtext"></input>
+			<input type="button" id="button1" value="Add" onclick="addpieman();"></input>
+			<br><br>
+
+			<div id="Result"></div>
+		
+			<br><br><br>
+		
+			<center>
+			Add your Twitch name: 
+			<input type="text" id="Twitchname"></input>
+			<input type="button" id="button2" value="Add" onclick="addnewchat();"></input>
+			</center>
+			<br>
+		</div>
+		
+		<div id="mydivoff" style="display:block">
+			<h4>Names background</h4>
+			Color: 
+			<input type="range" min="0" max="360" value="0" class="slider" id="selectColor">
+			<br>
+			Opacity:
+			<input type="range" min="0" max="100" value="0" class="slider" id="selectColor1">
+			<br>
+			Distance:
+			<input type="range" min="0" max="360" value="0" class="slider" id="selectColor2">
+			<br>
+			Numbers:
+			<input type="range" min="1" max="10" value="0" class="slider" id="selectColor3">
+			<br>
+			Light:
+			<input type="range" min="0" max="100" value="50" class="slider" id="selectColor3b">
+			<h4>Names Text:</h4>
+			Color: 
+			<input type="range" min="0" max="360" value="0" class="slider" id="selectColor4">
+			<br>
+			Light: 
+			<input type="range" min="0" max="100" value="0" class="slider" id="selectColor5">
+			<br>
+			Shadow color: 
+			<input type="range" min="0" max="360" value="0" class="slider" id="selectColor6">
+			<br>
+			Shadow light: 
+			<input type="range" min="0" max="100" value="0" class="slider" id="selectColor7">
+			<br>
+			Shadow blur: 
+			<input type="range" min="0" max="10" value="0" class="slider" id="selectColor8">
+			<h4>Background:</h4>
+			Color:
+			<input type="range" min="0" max="360" value="0" class="slider" id="selectColor9">
+			<br>
+			Light:
+			<input type="range" min="0" max="100" value="0" class="slider" id="selectColor10">
+			<br>
+			<br>
+			<h4>BG Picture:</h4>
+			<input type='file' name='img' size='65' id='uploadimage' />
+			<br>
+			Cut out BG:
+			<input type="checkbox" id="bgcutCheck" onclick="cutoutBGonoff()">
+			<br>
+			Reload and reset local storage:
+			<button onclick="resetlocalstorage()">Reset</button>
+		</div>
+
+
+	</div>
+
+	<br><br><br><br><br><br><br><br><br>
+	
+  </body>
+</html>
