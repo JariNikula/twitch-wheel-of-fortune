@@ -1,7 +1,7 @@
 # twitch-wheel-of-fortune
 A wheel of fortune app for the twitch using the tmi.min.js to gather names from the chat.
 
-Setup was made to be used with Window Capture and filters Crop/Pad and Color key
+Setup was made to be used with Window Capture and filters Crop/Pad and Color key.
 The browser window needs to be active to run.
 
 Add your twitch name to the wheel panel when you want to (activate) let them in chat enter the the wheel.
